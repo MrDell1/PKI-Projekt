@@ -17,10 +17,8 @@ const googleOauthHandler = async (req, res, next) => {
     const { id_token, access_token } = await getGoogleOauthToken(code);
 
     // Use the token to get the User
-    const { name, verified_email, email } = await getGoogleUser(
-      id_token,
-      access_token
-    );
+    const { given_name, family_name, verified_email, email } =
+      await getGoogleUser(id_token, access_token);
 
     // Check if user is verified
     if (!verified_email) {
@@ -29,7 +27,7 @@ const googleOauthHandler = async (req, res, next) => {
 
     // Update user if user already exist or create new user
     connection.query(
-      ` SELECT customer_id, email, provider FROM customers WHERE customers.email=${connection.escape(
+      ` SELECT customer_id, first_name, last_name, email, provider FROM customers WHERE customers.email=${connection.escape(
         email
       )}`,
       (err, result) => {
@@ -38,11 +36,10 @@ const googleOauthHandler = async (req, res, next) => {
         }
 
         if (!result.length) {
-          const nameArray = name.split(" ");
           connection.query(
-            `INSERT INTO customers (firstName, lastName, email, provider) VALUES (${connection.escape(
-              nameArray[0]
-            )},${connection.escape(nameArray[1])}, ${connection.escape(
+            `INSERT INTO customers (first_name, last_name, email, provider) VALUES (${connection.escape(
+              given_name
+            )},${connection.escape(family_name)}, ${connection.escape(
               email
             )}, 'google')`,
             (err) => {
@@ -52,11 +49,13 @@ const googleOauthHandler = async (req, res, next) => {
               }
             }
           );
+
           connection.query(
-            ` SELECT customer_id, firstName, lastName, email, provider, FROM customers WHERE customers.email=${connection.escape(
+            ` SELECT customer_id, first_name, last_name, email, provider FROM customers WHERE customers.email=${connection.escape(
               email
             )}`,
             (errSignUp, resultSignUp) => {
+              console.log(resultSignUp);
               if (errSignUp) {
                 throw new Error(errSignUp);
               }

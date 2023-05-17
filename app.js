@@ -18,7 +18,7 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 app.use(
   cors({
-    origin: ["https://pki-esj4.vercel.app", "https://localhost:5173"],
+    origin: ["https://pki-esj4.vercel.app", "http://localhost:5173"],
   })
 );
 
