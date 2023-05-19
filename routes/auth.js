@@ -16,14 +16,15 @@ router.get("/oauth/github", githubOauthHandler);
 router.post("/signin", function (req, res, next) {
   check(req.body.email, "Wrong email").isEmail();
   check(req.body.password, "Wrong password").isLength({ min: 2 });
-
+  console.log(req.body);
   connection.query(
-    ` SELECT customer_id, username, email, password, FROM customers WHERE email=${connection.escape(
+    ` SELECT customer_id, first_name, last_name, email, password FROM customers WHERE email=${connection.escape(
       req.body.email
     )}`,
     (err, result) => {
       if (err) {
-        return res.status(400).send({ error: err });
+        console.log(err);
+        return res.status(400).send(err.sqlMessage);
       }
       if (!result.length) {
         return res.status(401).send({
@@ -65,7 +66,7 @@ router.post("/signup", function (req, res, next) {
   check(req.body.password, "Wrong password").isLength({ min: 2 });
   check(req.body.firstName, "Wrong first name").isLength({ min: 1 });
   check(req.body.lastName, "Wrong last name").isLength({ min: 1 });
-
+  console.log(req.body)
   connection.query(
     ` SELECT * FROM customers WHERE email=${connection.escape(req.body.email)}`,
     (err, result) => {
