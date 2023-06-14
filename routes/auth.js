@@ -6,12 +6,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const googleOauthHandler =
   require("../controller/googleOauthHandler.js").googleOauthHandler;
-const githubOauthHandler =
-  require("../controller/githubOauthHandler.js").githubOauthHandler;
 let connection = require("../database").databaseConnection;
 
 router.get("/oauth/google", googleOauthHandler);
-router.get("/oauth/github", githubOauthHandler);
 
 router.post("/signin", function (req, res, next) {
   check(req.body.email, "Wrong email").isEmail();
@@ -66,7 +63,7 @@ router.post("/signup", function (req, res, next) {
   check(req.body.password, "Wrong password").isLength({ min: 2 });
   check(req.body.firstName, "Wrong first name").isLength({ min: 1 });
   check(req.body.lastName, "Wrong last name").isLength({ min: 1 });
-  console.log(req.body)
+  console.log(req.body);
   connection.query(
     ` SELECT * FROM customers WHERE email=${connection.escape(req.body.email)}`,
     (err, result) => {
